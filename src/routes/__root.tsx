@@ -7,6 +7,7 @@ import {
 
 import type { ReactNode } from "react";
 
+import globalsCss from "@/styles/globals.css?url";
 import { seo } from "@/utils/seo";
 
 export const Route = createRootRoute({
@@ -24,6 +25,12 @@ export const Route = createRootRoute({
           "TanStack Start | Type-Safe, Client-First, Full-Stack React Framework",
         description: `TanStack Start is a type-safe, client-first, full-stack React framework. `,
       }),
+    ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: globalsCss,
+      },
     ],
   }),
   component: RootComponent,
