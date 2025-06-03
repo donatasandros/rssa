@@ -11,14 +11,34 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as AuthRegistracijaIndexImport } from './routes/_auth/registracija/index'
+import { Route as AuthPrisijungimasIndexImport } from './routes/_auth/prisijungimas/index'
 
 // Create/Update Routes
+
+const AuthRouteRoute = AuthRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const AuthRegistracijaIndexRoute = AuthRegistracijaIndexImport.update({
+  id: '/registracija/',
+  path: '/registracija/',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+
+const AuthPrisijungimasIndexRoute = AuthPrisijungimasIndexImport.update({
+  id: '/prisijungimas/',
+  path: '/prisijungimas/',
+  getParentRoute: () => AuthRouteRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -32,39 +52,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/_auth/prisijungimas/': {
+      id: '/_auth/prisijungimas/'
+      path: '/prisijungimas'
+      fullPath: '/prisijungimas'
+      preLoaderRoute: typeof AuthPrisijungimasIndexImport
+      parentRoute: typeof AuthRouteImport
+    }
+    '/_auth/registracija/': {
+      id: '/_auth/registracija/'
+      path: '/registracija'
+      fullPath: '/registracija'
+      preLoaderRoute: typeof AuthRegistracijaIndexImport
+      parentRoute: typeof AuthRouteImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface AuthRouteRouteChildren {
+  AuthPrisijungimasIndexRoute: typeof AuthPrisijungimasIndexRoute
+  AuthRegistracijaIndexRoute: typeof AuthRegistracijaIndexRoute
+}
+
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthPrisijungimasIndexRoute: AuthPrisijungimasIndexRoute,
+  AuthRegistracijaIndexRoute: AuthRegistracijaIndexRoute,
+}
+
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof AuthRouteRouteWithChildren
+  '/prisijungimas': typeof AuthPrisijungimasIndexRoute
+  '/registracija': typeof AuthRegistracijaIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof AuthRouteRouteWithChildren
+  '/prisijungimas': typeof AuthPrisijungimasIndexRoute
+  '/registracija': typeof AuthRegistracijaIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_auth': typeof AuthRouteRouteWithChildren
+  '/_auth/prisijungimas/': typeof AuthPrisijungimasIndexRoute
+  '/_auth/registracija/': typeof AuthRegistracijaIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '' | '/prisijungimas' | '/registracija'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '' | '/prisijungimas' | '/registracija'
+  id:
+    | '__root__'
+    | '/'
+    | '/_auth'
+    | '/_auth/prisijungimas/'
+    | '/_auth/registracija/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRouteRoute: AuthRouteRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +148,27 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/_auth"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/_auth": {
+      "filePath": "_auth/route.tsx",
+      "children": [
+        "/_auth/prisijungimas/",
+        "/_auth/registracija/"
+      ]
+    },
+    "/_auth/prisijungimas/": {
+      "filePath": "_auth/prisijungimas/index.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/registracija/": {
+      "filePath": "_auth/registracija/index.tsx",
+      "parent": "/_auth"
     }
   }
 }
